@@ -1,6 +1,6 @@
 import React from 'react';
 import { Meteor } from 'meteor/meteor';
-import { Container, Loader, Card, Image, Label, Header } from 'semantic-ui-react';
+import { Container, Loader, Card } from 'semantic-ui-react';
 import { withTracker } from 'meteor/react-meteor-data';
 import PropTypes from 'prop-types';
 import { _ } from 'meteor/underscore';
@@ -8,7 +8,7 @@ import { Profiles, profilesName } from '../../api/profiles/Profiles';
 import { ProfilesInterests, profilesInterestsName } from '../../api/profiles/ProfilesInterests';
 import { ProfilesProjects, profilesProjectsName } from '../../api/profiles/ProfilesProjects';
 import { Projects, projectsName } from '../../api/projects/Projects';
-import { ProfileCard } from '../'
+import { ProfileCard } from '../components/ProfileCard';
 
 /** Returns the Profile and associated Projects and Interests associated with the passed user email. */
 function getProfileData(email) {
@@ -21,7 +21,7 @@ function getProfileData(email) {
 }
 
 /** Renders the Profile Collection as a set of Cards. */
-class ProfilesPage extends React.Component {
+class LuckyPage extends React.Component {
 
   /** If the subscription(s) have been received, render the page, otherwise show a loading icon. */
   render() {
@@ -30,19 +30,19 @@ class ProfilesPage extends React.Component {
 
   /** Render the page once subscriptions have been received. */
   renderPage() {
-    const emails = _.pluck(Profiles.find().fetch(), 'email');
-    const profileData = emails.map(email => getProfileData(email));
+    const email = _.sample(_.pluck(Profiles.find().fetch(), 'email'));
+    const profileData = getProfileData(email);
     return (
-      <Container>
-        <Card.Group>
-          {_.map(profileData, (profile, index) => <MakeCard key={index} profile={profile}/>)}
-        </Card.Group>
-      </Container>
+        <Container>
+          <Card.Group>
+            <ProfileCard profile={profileData}/>
+          </Card.Group>
+        </Container>
     );
   }
 }
 
-ProfilesPage.propTypes = {
+LuckyPage.propTypes = {
   ready: PropTypes.bool.isRequired,
 };
 
@@ -56,4 +56,4 @@ export default withTracker(() => {
   return {
     ready: sub1.ready() && sub2.ready() && sub3.ready() && sub4.ready(),
   };
-})(ProfilesPage);
+})(LuckyPage);
